@@ -17,7 +17,7 @@ export const register = async (req: Request, res: Response) => {
     const userExists = await prisma.user.findUnique({ where: { email } });
 
     if(userExists) {
-        return res.status(400).json({ message: 'User already exists' });
+        return res.status(409).json({ message: 'User already exists' });
     }
     
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -70,6 +70,38 @@ export const login = async (req: Request, res: Response) => {
             id: userFound.id,
             email: userFound.email
         },
-        token
+        accessToken: token
     });
+}
+
+export const getMe = async (req: Request, res: Response) => {
+    // 1. Check req.user exists
+    if(!req.user) {
+        return res.status(401).json({ message: 'Unauthorized user'});
+    }
+
+    // 2. Use req.user.userId
+    const userId = req.user.userId;
+
+    if(!userId) {
+        return res.status(401).json({ message: 'Unauthorized user'});
+    }
+
+    // 3. Fetch user from DB
+    const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+            id: true,
+            email: true,
+            role: true
+        }
+    })
+
+    if(!user) {
+        return res.status(404).json({ message: 'User not found' });
+    }
+
+    // 4. Return safe user data
+    return res.status(200).json({ status: 'success', data: user});
+    
 }
