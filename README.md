@@ -220,10 +220,10 @@ npm run dev
 
 ```json
 {
+  "message": "User registered successfully",
   "user": {
-    "id": "clx123",
-    "email": "test@example.com",
-    "role": "USER"
+    "id": "cmpiidmfd0000uotdpttmiquw",
+    "email": "test2@mail.com"
   }
 }
 ```
