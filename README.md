@@ -1,4 +1,4 @@
-# JWT Auth Playground
+# Auth Playground
 
 A small backend-focused authentication project built with Node.js, Express, Prisma, PostgreSQL, JWT, Zod, and bcrypt.
 
