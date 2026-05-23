@@ -17,9 +17,35 @@ model User {
   email    String   @unique
   password String
   role     Role     @default(USER)
+  
+  refreshTokens RefreshToken[]
 }
 
 enum Role {
   USER
   ADMIN
 }
+
+model RefreshToken {
+  id          String  @id @default(cuid())
+  tokenHash   String  @unique
+  userId      String 
+
+  expiresAt DateTime 
+  revokedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+
+
+
+
+
+
+
+
+

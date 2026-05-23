@@ -4,11 +4,20 @@ A small backend-focused authentication project built with Node.js, Express, Pris
 
 The goal of this project is to deeply understand how authentication works in modern web applications by building the core pieces manually.
 
+
+---
+
+## Disclaimer
+
+This project is a learning-focused authentication/security playground intended to explore backend architecture and security concepts progressively.
+
+The goal is to understand authentication flows, token management, validation, and secure backend practices rather than immediately build a production-ready authentication service.
+
 ---
 
 # Features
 
-## MVP Features
+## Current Features
 
 - User registration
 - User login
@@ -17,7 +26,10 @@ The goal of this project is to deeply understand how authentication works in mod
 - Password hashing with bcrypt
 - Request validation with Zod
 - Prisma ORM + PostgreSQL
-- Role-based authorization (`USER` / `ADMIN`)
+- JWT access + refresh token authentication
+- Refresh token rotation
+- Logout / session invalidation
+
 
 ---
 
@@ -65,17 +77,35 @@ jwt-auth-playground/
 
 ```prisma
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  role      Role     @default(USER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String            @id @default(cuid())
+  email           String            @unique
+  password        String
+  role            Role              @default(USER)
+  refreshTokens   RefreshToken[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
 }
 
 enum Role {
   USER
   ADMIN
+}
+```
+
+# Refresh Token Model
+
+```prisma
+model RefreshToken {
+  id              String            @id @default(cuid())
+  tokenHash       String            @unique
+  userId          String
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  expiresAt       DateTime
+  revokedAt       DateTime?
+
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
 }
 ```
 
@@ -228,6 +258,52 @@ npm run dev
 
 ---
 
+## Refresh
+
+### POST `/auth/refresh`
+
+### Request
+
+```json
+{
+  "refreshToken": "new_refresh_token"
+}
+```
+
+### Response
+
+```json
+{
+  "accessToken": "new_access_token",
+  "refreshToken": "new_refresh_token"
+}
+```
+
+---
+
+## Logout
+
+### POST `/auth/logout`
+
+### Request
+
+```json
+{
+  "refreshToken": "new_refresh_token"
+}
+```
+
+### Response
+
+```json
+{
+  "message": "Logged out successfully"
+}
+```
+
+---
+
+
 ## Protected Route
 
 ### GET `/auth/me`
@@ -256,20 +332,20 @@ Authorization: Bearer <token>
 
 ## Phase 1 (MVP)
 
-- [ ] Basic Express server
-- [ ] Connect Prisma
-- [ ] Create User model
-- [ ] Register route
-- [ ] Login route
-- [ ] JWT creation
-- [ ] Auth middleware
-- [ ] Protected `/me` route
+- [x] Basic Express server
+- [x] Connect Prisma
+- [x] Create User model
+- [x] Register route
+- [x] Login route
+- [x] JWT creation
+- [x] Auth middleware
+- [x] Protected `/me` route
 
 ---
 
 ## Phase 2
 
-- [ ] Refresh tokens
+- [x] Refresh tokens
 - [ ] Secure HTTP-only cookies
 - [ ] Role-based middleware
 - [ ] Rate limiting
@@ -295,24 +371,52 @@ This project is meant to teach:
 
 ---
 
+# Security Concepts Practiced
+
+- Password hashing with bcrypt
+- JWT authentication
+- Access token vs refresh token architecture
+- Refresh token rotation
+- Token revocation
+- Session invalidation
+- Request validation with Zod
+- Transaction-safe token rotation
+- Race condition prevention
+
+---
+
 # Authentication Flow
 
 ```txt
 User registers
-→ Password gets hashed
+→ Password hashed with bcrypt
 → User saved in database
 
 User logs in
 → Password compared with bcrypt
-→ JWT generated
+→ Access token generated
+→ Refresh token generated
+→ Refresh token hashed and stored in database
 
 Protected route accessed
-→ Middleware verifies JWT
+→ Middleware verifies access token
 → User information attached to request
 → Route returns protected data
+
+Access token expires
+→ Client sends refresh token
+→ Refresh token validated
+→ Old refresh token revoked
+→ New access token issued
+→ New refresh token issued
+
+User logs out
+→ Refresh token revoked
+→ Session invalidated
 ```
 
 ---
+
 
 # Notes
 
