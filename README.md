@@ -247,12 +247,13 @@ npm run dev
 
 ```json
 {
-  "accessToken": "jwt_token_here",
-  "user": {
+  "status": "success",
+  "data": {
     "id": "clx123",
     "email": "test@example.com",
-    "role": "USER"
-  }
+  },
+  "accessToken": "access_token_here",
+  "refreshToken": "refresh_token_here"
 }
 ```
 
