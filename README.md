@@ -327,6 +327,18 @@ Authorization: Bearer <token>
 }
 ```
 
+## Admin Route
+
+### GET `/auth/admin`
+
+### Headers
+
+Authorization: Bearer <token>
+
+### Access
+
+ADMIN only
+
 ---
 
 # Build Order
@@ -347,8 +359,8 @@ Authorization: Bearer <token>
 ## Phase 2
 
 - [x] Refresh tokens
+- [x] Role-based middleware
 - [ ] Secure HTTP-only cookies
-- [ ] Role-based middleware
 - [ ] Rate limiting
 - [ ] Email verification
 - [ ] Password reset
@@ -383,6 +395,8 @@ This project is meant to teach:
 - Request validation with Zod
 - Transaction-safe token rotation
 - Race condition prevention
+- Role-based access control (RBAC)
+- Authentication vs authorization
 
 ---
 
@@ -403,6 +417,11 @@ Protected route accessed
 → Middleware verifies access token
 → User information attached to request
 → Route returns protected data
+
+Admin route accessed
+→ Role middleware checks permissions
+→ Unauthorized roles rejected
+→ Authorized roles granted access
 
 Access token expires
 → Client sends refresh token

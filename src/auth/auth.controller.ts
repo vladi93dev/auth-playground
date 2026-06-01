@@ -101,6 +101,8 @@ export const getMe = async (req: Request, res: Response) => {
     // 2. Use req.user.userId
     const userId = req.user.userId;
 
+    console.log(req.user);
+
     // 3. Fetch user from DB
     const user = await prisma.user.findUnique({
         where: { id: userId },
@@ -221,3 +223,12 @@ export const logout = async(req: Request, res: Response) => {
 
     return res.status(200).json({ message: 'Logged out successfully'});
 }
+
+export const admin = async(req: Request, res: Response) => {
+    try {
+        res.status(401).json({message: 'Admin access granted'});
+    } catch(error) {
+        res.status(401).json({ message: error })
+    }
+}
+

@@ -2,11 +2,10 @@ import type { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '../config/env.js';
 
-export default function authMiddleware (req: Request, res: Response, next: NextFunction)  {
+function authMiddleware (req: Request, res: Response, next: NextFunction)  {
 // Incoming request
 // 1. Read Authorization header
     const authHeader = req.headers['authorization'];
-    
     
     // 2. Check that it exists
     if(!authHeader) {
@@ -42,3 +41,19 @@ export default function authMiddleware (req: Request, res: Response, next: NextF
         return res.status(401).json({ message: 'Invalid or expired token' });
     }
 }
+
+function roleMiddleware(allowedRoles: string[]) {
+    return (req: Request, res: Response, next: NextFunction) => {
+        if(!req.user) {
+            return res.status(401).json({error: 'User not authorized'});
+        }
+
+        if(!allowedRoles.includes(req.user.role)) {
+           return res.status(403).json({ message: 'User not authorized' });
+        } 
+
+        next();
+    }
+}
+
+export { authMiddleware, roleMiddleware };

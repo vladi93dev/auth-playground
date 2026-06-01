@@ -7,7 +7,7 @@ if(!JWT_SECRET) {
 }
 
 const signJwt = (userId: string, role: string) => {
-    return jwt.sign({ userId, role }, JWT_SECRET, { expiresIn: '1h' });
+    return jwt.sign({ userId, role }, JWT_SECRET, { expiresIn: '30s' });
 }
 
 const generateRefreshToken = () => {
