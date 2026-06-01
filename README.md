@@ -333,11 +333,21 @@ Authorization: Bearer <token>
 
 ### Headers
 
+```txt
 Authorization: Bearer <token>
+```
 
 ### Access
 
 ADMIN only
+
+### Response
+
+```json
+{
+  "message": "Admin access granted"
+}
+```
 
 ---
 

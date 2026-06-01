@@ -14,6 +14,6 @@ router.post('/refresh', refresh);
 
 router.post('/logout', logout);
 
-router.post('/admin', authMiddleware, roleMiddleware(['ADMIN']), admin);
+router.get('/admin', authMiddleware, roleMiddleware(['ADMIN']), admin);
 
 export default router;
